@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>デバッグ情報</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .info {
+      background-color: white;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border-left: 4px solid #4CAF50;
+    }
+    .error {
+      background-color: #ffebee;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border-left: 4px solid #c62828;
+      color: #c62828;
+    }
+    .success {
+      background-color: #e8f5e9;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border-left: 4px solid #2e7d32;
+      color: #2e7d32;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-size: 16px;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 デバッグ情報</h1>
+  
+  <div id="protocol-info" class="info"></div>
+  <div id="errors" class="error" style="display: none;"></div>
+  <div id="console-log"></div>
+  
+  <button onclick="testApp()">アプリをテスト</button>
+  <button onclick="location.href='index.html'">アプリを開く</button>
+  
+  <script>
+    // プロトコル情報を表示
+    const protocolInfo = document.getElementById('protocol-info');
+    protocolInfo.innerHTML = `
+      <strong>現在のプロトコル:</strong> ${window.location.protocol}<br>
+      <strong>URL:</strong> ${window.location.href}<br>
+      <strong>User Agent:</strong> ${navigator.userAgent}
+    `;
+    
+    // file:// プロトコルの警告
+    if (window.location.protocol === 'file:') {
+      const warning = document.createElement('div');
+      warning.className = 'error';
+      warning.innerHTML = `
+        <strong>⚠️ 警告: file:// プロトコルで開いています</strong><br>
+        このプロトコルでは以下の機能が制限されます：<br>
+        • Service Workerが動作しない<br>
+        • 「ホーム画面に追加」が表示されない<br>
+        • 一部のJavaScript機能が制限される<br>
+        <br>
+        <strong>解決方法:</strong><br>
+        1. ローカルサーバーを使用する<br>
+        2. Webサーバーにアップロードする
+      `;
+      document.body.insertBefore(warning, protocolInfo.nextSibling);
+    }
+    
+    // エラーをキャッチ
+    window.addEventListener('error', (event) => {
+      const errorsDiv = document.getElementById('errors');
+      errorsDiv.style.display = 'block';
+      errorsDiv.innerHTML += `
+        <strong>エラー:</strong> ${event.message}<br>
+        <strong>ファイル:</strong> ${event.filename}<br>
+        <strong>行:</strong> ${event.lineno}:${event.colno}<br>
+        <hr>
+      `;
+    });
+    
+    // コンソールログをキャプチャ
+    const originalLog = console.log;
+    const originalError = console.error;
+    const consoleLogDiv = document.getElementById('console-log');
+    
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      const div = document.createElement('div');
+      div.className = 'info';
+      div.innerHTML = '<strong>Log:</strong> ' + args.join(' ');
+      consoleLogDiv.appendChild(div);
+    };
+    
+    console.error = function(...args) {
+      originalError.apply(console, args);
+      const div = document.createElement('div');
+      div.className = 'error';
+      div.innerHTML = '<strong>Error:</strong> ' + args.join(' ');
+      consoleLogDiv.appendChild(div);
+    };
+    
+    // アプリのテスト
+    function testApp() {
+      console.log('アプリのテストを開始...');
+      
+      // LocalStorageのテスト
+      try {
+        localStorage.setItem('test', 'value');
+        localStorage.removeItem('test');
+        console.log('✓ LocalStorage: 動作OK');
+      } catch (e) {
+        console.error('✗ LocalStorage: エラー - ' + e.message);
+      }
+      
+      // Service Workerのテスト
+      if ('serviceWorker' in navigator) {
+        console.log('✓ Service Worker: サポートあり');
+        if (window.location.protocol === 'file:') {
+          console.error('✗ Service Worker: file://プロトコルでは登録できません');
+        }
+      } else {
+        console.error('✗ Service Worker: サポートなし');
+      }
+      
+      // Manifestのテスト
+      if (window.location.protocol !== 'file:') {
+        fetch('./manifest.json')
+          .then(r => r.json())
+          .then(data => console.log('✓ Manifest: 読み込みOK', data))
+          .catch(e => console.error('✗ Manifest: エラー - ' + e.message));
+      }
+      
+      // JavaScriptファイルの読み込みテスト
+      const scripts = [
+        './js/utils/constants.js',
+        './js/models/FoodItem.js',
+        './js/app.js'
+      ];
+      
+      scripts.forEach(src => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => console.log('✓ スクリプト読み込みOK: ' + src);
+        script.onerror = () => console.error('✗ スクリプト読み込みエラー: ' + src);
+      });
+    }
+  </script>
+</body>
+</html>

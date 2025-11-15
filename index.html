@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="離乳食レシピ">
+  <meta name="theme-color" content="#4CAF50">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./css/styles.css">
+  <title>離乳食レシピ</title>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>🍚 離乳食レシピ</h1>
+    </header>
+    
+    <nav class="tab-navigation">
+      <button class="tab-button active" data-tab="recipe">レシピ生成</button>
+      <button class="tab-button" data-tab="inventory">在庫管理</button>
+      <button class="tab-button" data-tab="history">履歴</button>
+    </nav>
+    
+    <main>
+      <div id="recipe-view" class="tab-content active"></div>
+      <div id="inventory-view" class="tab-content"></div>
+      <div id="history-view" class="tab-content"></div>
+    </main>
+  </div>
+  
+  <script src="./js/utils/constants.js"></script>
+  <script src="./js/models/FoodItem.js"></script>
+  <script src="./js/models/Recipe.js"></script>
+  <script src="./js/models/Inventory.js"></script>
+  <script src="./js/services/StorageService.js"></script>
+  <script src="./js/services/HistoryService.js"></script>
+  <script src="./js/services/RecipeGenerator.js"></script>
+  <script src="./js/ui/RecipeView.js"></script>
+  <script src="./js/ui/InventoryView.js"></script>
+  <script src="./js/ui/HistoryView.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
