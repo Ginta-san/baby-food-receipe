@@ -50,7 +50,12 @@ class RecipeGenerator {
       selectedItems.push(...dairy);
     }
     
-    const recipe = new Recipe(mealType, new Date().toISOString(), selectedItems);
+    // 日付を正規化（時刻を00:00:00に設定）
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dateString = today.toISOString();
+    
+    const recipe = new Recipe(mealType, dateString, selectedItems);
     return recipe;
   }
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'baby-food-v4';
+const CACHE_NAME = 'baby-food-v5';
 const urlsToCache = [
   './',
   './index.html',
